@@ -8,7 +8,7 @@
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
-
+const Realm = require('realm');
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -18,14 +18,32 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
+  constructor(props) {
+    super(props);
+    this.state = { realm: null };
+  }
+
+  componentWillMount() {
+    Realm.open({
+      schema: [{name: 'Dog', properties: {name: 'string'}}]
+    }).then(realm => {
+      realm.write(() => {
+        realm.create('Dog', {name: 'Rex'});
+      });
+      this.setState({ realm });
+    });
+  }
+
   render() {
+    const info = this.state.realm
+      ? 'Number of dogs in this Realm: ' + this.state.realm.objects('Dog').length
+      : 'Loading...';
+
     return (
       <View style={styles.container}>
-        <Text>{Platform.OS}</Text>
-        <Text>{Platform.Version}</Text>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit Apps.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Text style={styles.welcome}>
+          {info}
+        </Text>
       </View>
     );
   }
@@ -49,3 +67,5 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+
