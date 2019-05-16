@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Button, Platform, StyleSheet, Text, View} from 'react-native';
+import {Button, Platform, StyleSheet, Text, View, Image, SectionList, ScrollView, ListView, Header} from 'react-native';
 const Realm = require('realm');
 export const sonidoPerro = require('./sounds/perro/Dog-barking-sound-big-dog.wav'); 
 const instructions = Platform.select({
@@ -18,40 +18,46 @@ const instructions = Platform.select({
 });
 import Sound from 'react-native-sound';
 //import  {Animals}  from "./Animals";
-var soundPerro1 = require('./sounds/perro/Dog-barking-sound-big-dog.wav');
-var soundPerro2 = require('./sounds/perro/Dog-barking-sounds.wav');
-var soundPerro3 = require('./sounds/perro/Dog-barking-sound-sheeps-baa-background.wav');
-var soundGato1 = require('./sounds/gato/Cat-sound.wav');
-var soundSergio1 = require('./sounds/sergio/dia-de-mierda.mp3');
-var soundSergio2 = require('./sounds/sergio/mentiroso.mp3');
-var soundSergio3 = require('./sounds/sergio/mini-cuerno.mp3');
-var soundSergio4 = require('./sounds/sergio/mm-que-paja.mp3');
-var soundSergio5 = require('./sounds/sergio/puerco-putero.mp3');
-var soundSergio6 = require('./sounds/sergio/que-paja-esperar.mp3');
-var soundSergio7 = require('./sounds/sergio/rosario.mp3');
 
 const Animals = {//pico pal que lee
   Perro : {
-    //Archivos : [{title: "1", sound : require('./sounds/perro/Dog-barking-sound-big-dog.wav')}, {title: "2", sound : require('./sounds/perro/Dog-barking-sound-big-dog.wav')}, {title: "3", sound : require('./sounds/perro/Dog-barking-sound-big-dog.wav')}]
-    Archivos : [{title: "3", sound : require('./sounds/perro/Dog-barking-sound-big-dog.wav')}]
+    Archivos : [
+      {title: "1", sound : require('./sounds/perro/Dog-barking-sound-big-dog.wav')}, 
+      {title: "2", sound : require('./sounds/perro/Dog-barking-sounds.wav')}, 
+      {title: "3", sound : require('./sounds/perro/Dog-barking-sound-sheeps-baa-background.wav')}
+    ]
   },
   Gato: {
-    Archivos : [soundGato1]
+    Archivos : [
+      {title: "1", sound : require('./sounds/gato/Cat-sound.wav')}
+    ]
   },
   Sergio : {
-    Archivos : [{title: "1", sound : soundSergio1}, {title: "2", sound : soundSergio2}, {title: "3", sound : soundSergio3}, {title: "4", sound : soundSergio4}, {title: "5", sound : soundSergio5}, {title: "6", sound : soundSergio6}, {title: "7", sound : soundSergio7}]
+    Archivos : [
+      {title: "1", sound : require('./sounds/sergio/dia-de-mierda.mp3')}, 
+        {title: "2", sound : require('./sounds/sergio/mentiroso.mp3')}, 
+        {title: "3", sound : require('./sounds/sergio/mini-cuerno.mp3')}, 
+        {title: "4", sound : require('./sounds/sergio/mm-que-paja.mp3')}, 
+        {title: "5", sound : require('./sounds/sergio/puerco-putero.mp3')}, 
+        {title: "6", sound : require('./sounds/sergio/que-paja-esperar.mp3')}, 
+        {title: "7", sound : require('./sounds/sergio/rosario.mp3')}
+    ],
+    Imagen:  require('./images/sergio.jpg')
   }
 };
 type Props = {};
 export default class App extends Component<Props> {
+  
   constructor(props) {
     super(props);
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = { 
       realm: null, 
       TextButton : "Play", 
       Sound  : null,
       Animales : {},
-      CurrentKeyBtn: null
+      CurrentKeyBtn: null,
+      dataSource: ds.cloneWithRows(['row 1', 'row 2'])
     };
     this.playSound = this.playSound.bind(this);
   }
@@ -72,23 +78,62 @@ export default class App extends Component<Props> {
       ? 'Number of dogs in this Realm: ' + this.state.realm.objects('Dog').length
       : 'Loading...';
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Sonidos Don Sergio
-        </Text>
-        {
-          Animals.Perro.Archivos.map((file, i) =>{
-            return (
-              <Button title={i == this.state.CurrentKeyBtn ? "Stop" : "Play"} key={i} onPress={() => {
-                return this.playSound(this, file, i);
-              }}/>
-            );
+      <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            Sonidos Don Sergio
+          </Text>
+          <Image style={{width: 250, height: 250}} source={Animals.Sergio.Imagen}/>
+          {
+            Animals.Perro.Archivos.map((file, i) =>{
+              return (
+                <Button title={i == this.state.CurrentKeyBtn ? "Stop" : "Play"} key={i} onPress={() => {
+                  return this.playSound(this, file, i);
+                }}/>
+              );
 
-          })
+            })
 
-        }
-       
-      </View>
+          }
+          
+        </View>
+        <View >
+          <Text >
+            Sonidos Don Sergio
+          </Text>
+          {
+            Animals.Perro.Archivos.map((file, i) =>{
+              return (
+                <Button title={i == this.state.CurrentKeyBtn ? "Stop" : "Play"} key={i} onPress={() => {
+                  return this.playSound(this, file, i);
+                }}/>
+              );
+
+            })
+
+          }
+          <Text >
+            Sonidos Perro
+          </Text>
+          {
+            Animals.Perro.Archivos.map((file, i) =>{
+              return (
+                <Button title={i == this.state.CurrentKeyBtn ? "Stop" : "Play"} key={i} onPress={() => {
+                  return this.playSound(this, file, i);
+                }}/>
+              );
+
+            })
+
+          }
+        </View>
+        <View>
+          <ListView
+            dataSource={this.state.dataSource}
+            renderRow={(rowData) => <Text>{rowData}</Text>}
+          />
+        </View>
+      </ScrollView>
     );
   }
   playSound(component,item, key) {
@@ -128,7 +173,6 @@ export default class App extends Component<Props> {
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
